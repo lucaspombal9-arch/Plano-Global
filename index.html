@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programa Global — Futebol Profissional</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #080808;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: #222222;
+  --border2: #2e2e2e;
+  --text: #e8e8e8;
+  --muted: #666;
+  --muted2: #888;
+  /* Country colors */
+  --br: #00C851;
+  --es: #D4001A;
+  --de: #FFD600;
+  --en: #1565C0;
+  --nl: #FF6F00;
+  --pt: #006400;
+  /* Intensity */
+  --low: #4CAF50;
+  --mid: #FF9800;
+  --high: #F44336;
+  --max: #E040FB;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+/* ===== TOP HEADER ===== */
+.masthead {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  border-bottom: 2px solid var(--border2);
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+
+.masthead-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(36px, 7vw, 68px);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+}
+
+.h1-line1 { color: var(--text); }
+.h1-line2 { color: var(--br); }
+.h1-line3 { color: var(--muted); font-weight: 400; font-size: 0.55em; letter-spacing: 2px; }
+
+.stats-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.stat-pill {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  padding: 4px 10px;
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* ===== FLAGS ROW ===== */
+.flags-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.flag-card {
+  flex: 1;
+  min-width: 100px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.flag-card:hover { transform: translateY(-2px); }
+
+.flag-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+}
+
+.flag-card.br::before { background: var(--br); }
+.flag-card.es::before { background: var(--es); }
+.flag-card.de::before { background: var(--de); }
+.flag-card.en::before { background: var(--en); }
+.flag-card.nl::before { background: var(--nl); }
+.flag-card.pt::before { background: var(--pt); }
+
+.flag-card.br:hover { border-color: var(--br); }
+.flag-card.es:hover { border-color: var(--es); }
+.flag-card.de:hover { border-color: var(--de); }
+.flag-card.en:hover { border-color: var(--en); }
+.flag-card.nl:hover { border-color: var(--nl); }
+.flag-card.pt:hover { border-color: var(--pt); }
+
+.flag-emoji { font-size: 20px; margin-bottom: 4px; }
+.flag-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.flag-method {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-top: 2px;
+}
+
+/* ===== SECTION HEADER ===== */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 36px 0 16px;
+}
+
+.section-head h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.section-head::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+}
+
+.section-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  letter-spacing: 2px;
+}
+
+/* ===== METHOD CARDS ===== */
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.method-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 18px;
+  position: relative;
+}
+
+.method-flag {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.method-country {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.method-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.method-card.br .method-country { color: var(--br); }
+.method-card.br .method-label { background: rgba(0,200,81,0.1); color: var(--br); }
+.method-card.es .method-country { color: var(--es); }
+.method-card.es .method-label { background: rgba(212,0,26,0.1); color: var(--es); }
+.method-card.de .method-country { color: var(--de); }
+.method-card.de .method-label { background: rgba(255,214,0,0.1); color: var(--de); }
+.method-card.en .method-country { color: var(--en); }
+.method-card.en .method-label { background: rgba(21,101,192,0.1); color: var(--en); }
+.method-card.nl .method-country { color: var(--nl); }
+.method-card.nl .method-label { background: rgba(255,111,0,0.1); color: var(--nl); }
+.method-card.pt .method-country { color: var(--pt); }
+.method-card.pt .method-label { background: rgba(0,100,0,0.1); color: var(--pt); }
+
+.method-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.method-text {
+  font-size: 12px;
+  color: var(--muted2);
+  line-height: 1.7;
+}
+
+.method-takeaway {
+  margin-top: 12px;
+  background: var(--surface2);
+  border-left: 3px solid;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text);
+}
+
+.method-card.br .method-takeaway { border-color: var(--br); }
+.method-card.es .method-takeaway { border-color: var(--es); }
+.method-card.de .method-takeaway { border-color: var(--de); }
+.method-card.en .method-takeaway { border-color: var(--en); }
+.method-card.nl .method-takeaway { border-color: var(--nl); }
+.method-card.pt .method-takeaway { border-color: var(--pt); }
+
+/* ===== WHAT SCOUTS LOOK FOR ===== */
+.scout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.scout-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 14px;
+}
+
+.scout-rank {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--border2);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.scout-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.scout-desc {
+  font-size: 11px;
+  color: var(--muted2);
+  line-height: 1.6;
+}
+
+/* ===== WEEKLY SCHEDULE ===== */
+.week-intro {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.week-intro-stat { }
+
+.wis-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.wis-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* DAY CARDS */
+.day {
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  background: var(--surface);
+}
+
+.day-bar {
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+  user-select: none;
+  min-height: 64px;
+}
+
+.day-accent {
+  width: 5px;
+  flex-shrink: 0;
+}
+
+.day-content {
+  flex: 1;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.day-left-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.day-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--border2);
+  min-width: 36px;
+}
+
+.day.open .day-num { color: inherit; }
+
+.day-text { }
+
+.day-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+
+.day-subtitle {
+  font-size: 11px;
+  color: var(--muted2);
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.day-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.int-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid;
+}
+
+.int-low { color: var(--low); border-color: var(--low); }
+.int-mid { color: var(--mid); border-color: var(--mid); }
+.int-high { color: var(--high); border-color: var(--high); }
+.int-max { color: var(--max); border-color: var(--max); }
+
+.day-arrow {
+  color: var(--muted);
+  font-size: 16px;
+  transition: transform 0.25s;
+}
+.day.open .day-arrow { transform: rotate(180deg); }
+
+.day-body {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 16px 20px 20px;
+}
+.day.open .day-body { display: block; }
+
+/* BLOCKS */
+.block { margin-bottom: 20px; }
+.block:last-child { margin-bottom: 0; }
+
+.block-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.block-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.block-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.block-duration {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* EXERCISE TABLE */
+.ex-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ex-table tr {
+  border-bottom: 1px solid var(--border);
+}
+.ex-table tr:last-child { border-bottom: none; }
+
+.ex-table td {
+  padding: 7px 0;
+  vertical-align: top;
+}
+
+.ex-name {
+  font-weight: 600;
+  font-size: 13px;
+  padding-right: 12px;
+}
+
+.ex-detail {
+  font-size: 11px;
+  color: var(--muted2);
+  line-height: 1.5;
+  padding-right: 12px;
+}
+
+.ex-origin {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  padding: 2px 5px;
+  border-radius: 2px;
+  white-space: nowrap;
+  letter-spacing: 1px;
+}
+
+.ex-sets {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--mid);
+  white-space: nowrap;
+  text-align: right;
+  padding-left: 8px;
+}
+
+.origin-br { background: rgba(0,200,81,0.1); color: var(--br); }
+.origin-es { background: rgba(212,0,26,0.1); color: var(--es); }
+.origin-de { background: rgba(255,214,0,0.1); color: var(--de); }
+.origin-en { background: rgba(21,101,192,0.1); color: var(--en); }
+.origin-nl { background: rgba(255,111,0,0.1); color: var(--nl); }
+.origin-pt { background: rgba(0,100,0,0.1); color: var(--pt); }
+.origin-all { background: rgba(255,255,255,0.05); color: var(--muted2); }
+
+.obs {
+  background: var(--surface2);
+  border-left: 3px solid var(--border2);
+  padding: 10px 14px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted2);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* LEGEND */
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0 28px;
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.leg-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+
+/* PHYSICAL BLOCKS SECTION */
+.phys-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.phys-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+
+.phys-icon { font-size: 24px; margin-bottom: 8px; }
+
+.phys-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.phys-exs {
+  font-size: 11px;
+  color: var(--muted2);
+  line-height: 1.9;
+}
+
+.phys-origin {
+  margin-top: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* MENTAL */
+.mental-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.mental-icon { font-size: 18px; padding-top: 2px; }
+
+.mental-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+
+.mental-desc {
+  font-size: 12px;
+  color: var(--muted2);
+  line-height: 1.6;
+}
+
+.mental-source {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  text-align: right;
+  letter-spacing: 1px;
+  padding-top: 2px;
+  white-space: nowrap;
+}
+
+/* BIG QUOTE */
+.big-quote {
+  border: 1px solid var(--border2);
+  padding: 24px 28px;
+  margin: 24px 0;
+  position: relative;
+}
+
+.bq-mark {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 80px;
+  font-weight: 900;
+  color: var(--border2);
+  line-height: 0.6;
+  position: absolute;
+  top: 16px; left: 16px;
+}
+
+.bq-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.4;
+  padding-left: 24px;
+  color: var(--text);
+}
+
+.bq-source {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 8px;
+  padding-left: 24px;
+  letter-spacing: 2px;
+}
+
+/* PERIODIZATION */
+.period-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+}
+
+.period-table th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border2);
+}
+
+.period-table td {
+  padding: 10px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.period-table tr:last-child td { border-bottom: none; }
+
+.period-table td:first-child {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--mid);
+  white-space: nowrap;
+}
+
+.period-table td:nth-child(2) {
+  font-size: 11px;
+  color: var(--muted2);
+  max-width: 300px;
+}
+
+/* FOOTER */
+.footer-bar {
+  margin-top: 60px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* TABS */
+.tab-row {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border2);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.tab.active { color: var(--text); border-color: var(--br); }
+.tab:hover { color: var(--muted2); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* MISC */
+.divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+.highlight-box {
+  background: rgba(0,200,81,0.05);
+  border: 1px solid rgba(0,200,81,0.2);
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+
+.highlight-box p { font-size: 13px; line-height: 1.8; }
+.highlight-box strong { color: var(--br); }
+
+@media (max-width: 600px) {
+  .masthead { grid-template-columns: 1fr; }
+  .stats-col { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+  .day-num { font-size: 34px; }
+  .day-name { font-size: 16px; }
+  .int-badge { display: none; }
+  .bq-text { font-size: 17px; }
+  .ex-origin { display: none; }
+}
+</style>
+
+  <!-- PWA: Favicon & Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- PWA: Theme -->
+  <meta name="theme-color" content="#080808">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Programa Global">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="Programa de treino de futebol profissional — 6 metodologias, 6 dias por semana, sem clube.">
+
+  <!-- PWA: Service Worker registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('[SW] Registrado:', reg.scope))
+          .catch(err => console.warn('[SW] Falha:', err));
+      });
+    }
+  </script>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div>
+    <div class="masthead-tag">⚽ Programa Individual · Sem clube · Alta performance</div>
+    <h1>
+      <div class="h1-line1">PROGRAMA</div>
+      <div class="h1-line2">GLOBAL</div>
+      <div class="h1-line3">Brasil · Espanha · Alemanha · Inglaterra · Holanda · Portugal</div>
+    </h1>
+  </div>
+  <div class="stats-col">
+    <span class="stat-pill">6 METODOLOGIAS</span>
+    <span class="stat-pill">6 DIAS / SEMANA</span>
+    <span class="stat-pill">90–120 MIN / DIA</span>
+    <span class="stat-pill">SEM ACADEMIA</span>
+  </div>
+</div>
+
+<!-- FLAGS -->
+<div class="flags-row">
+  <div class="flag-card br">
+    <div class="flag-emoji">🇧🇷</div>
+    <div class="flag-name">Brasil</div>
+    <div class="flag-method">Ginga + Criatividade</div>
+  </div>
+  <div class="flag-card es">
+    <div class="flag-emoji">🇪🇸</div>
+    <div class="flag-name">Espanha</div>
+    <div class="flag-method">Jogo de Posição</div>
+  </div>
+  <div class="flag-card de">
+    <div class="flag-emoji">🇩🇪</div>
+    <div class="flag-name">Alemanha</div>
+    <div class="flag-method">Físico + Estrutura</div>
+  </div>
+  <div class="flag-card en">
+    <div class="flag-emoji">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+    <div class="flag-name">Inglaterra</div>
+    <div class="flag-method">Intensidade + Duelo</div>
+  </div>
+  <div class="flag-card nl">
+    <div class="flag-emoji">🇳🇱</div>
+    <div class="flag-name">Holanda</div>
+    <div class="flag-method">Futebol Total</div>
+  </div>
+  <div class="flag-card pt">
+    <div class="flag-emoji">🇵🇹</div>
+    <div class="flag-name">Portugal</div>
+    <div class="flag-method">Periodização Tática</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-row">
+  <div class="tab active" onclick="switchTab('metodologias')">Metodologias</div>
+  <div class="tab" onclick="switchTab('rotina')">Rotina Semanal</div>
+  <div class="tab" onclick="switchTab('fisico')">Físico Detalhado</div>
+  <div class="tab" onclick="switchTab('mental')">Mental</div>
+  <div class="tab" onclick="switchTab('periodizacao')">Periodização</div>
+</div>
+
+<!-- ============ TAB: METODOLOGIAS ============ -->
+<div class="tab-panel active" id="tab-metodologias">
+
+  <div class="section-head">
+    <span class="section-num">01</span>
+    <h2>O que cada escola ensina</h2>
+  </div>
+  <p style="color:var(--muted2); font-size:12px; margin-bottom:16px;">Cada país tem uma filosofia diferente de desenvolver jogadores. O atleta que domina a melhor de cada uma chega ao profissional mais completo.</p>
+
+  <div class="method-grid">
+
+    <div class="method-card br">
+      <div class="flag-emoji">🇧🇷</div>
+      <div class="method-country">Brasil</div>
+      <div class="method-label">MÉTODO ANALÍTICO + GINGA</div>
+      <div class="method-title">Fundamentos + Criatividade</div>
+      <div class="method-text">O futebol brasileiro valoriza acima de tudo o domínio técnico individual: o fundamento perfeito, o toque refinado, a criatividade espontânea. Preparadores físicos como Lucas Faria (Botafogo) confirmam que o treino com bola é o eixo central — a parte física vem integrada a ele. Alta intensidade em períodos curtos, muito trabalho individual de fundamentos.</div>
+      <div class="method-takeaway">✦ Para você aplicar: 45–60 min de técnica pura por dia. Pé fraco, embaixadinhas, passe na parede, drible em cones. Quantidade de toques na bola é o KPI principal.</div>
+    </div>
+
+    <div class="method-card es">
+      <div class="flag-emoji">🇪🇸</div>
+      <div class="method-country">Espanha</div>
+      <div class="method-label">TREINO ESTRUTURADO / POSICIONAL</div>
+      <div class="method-title">Inteligência + Posicionamento</div>
+      <div class="method-text">A escola espanhola (criada por Paco Seirul·lo no Barcelona) coloca o jogador como centro do processo. O treino estruturado visa desenvolver 7 níveis: físico, técnico, cognitivo, socioafetivo, volitivo, expressivo e mental. Espanhóis e portugueses simulam jogos para treinar, diferente de alemães e ingleses que focam no condicionamento físico isolado. Estudos na Science and Medicine in Football confirmam isso.</div>
+      <div class="method-takeaway">✦ Para você aplicar: Treino de tomada de decisão — conduza a bola SEM olhar para ela. Varie os exercícios, nunca repita o mesmo duas vezes seguidas. Adaptação é a chave.</div>
+    </div>
+
+    <div class="method-card de">
+      <div class="flag-emoji">🇩🇪</div>
+      <div class="method-country">Alemanha</div>
+      <div class="method-label">FÍSICO + ESTRUTURA TÁTICA</div>
+      <div class="method-title">Força + Organização</div>
+      <div class="method-text">Alemães e ingleses priorizam condicionamento físico intenso e tomada de decisão estruturada. A Alemanha prova que "não existe lugar ruim para treinar" — jogadores da seleção já fizeram treinos com bola em tapete de hotel. O foco alemão é: base física sólida + leitura tática + intensidade coletiva. Sprints, força de perna e resistência são pilares.</div>
+      <div class="method-takeaway">✦ Para você aplicar: 2–3 sessões por semana focadas em força (agachamento, pliometria, core). Sem base física, a técnica desaparece no segundo tempo.</div>
+    </div>
+
+    <div class="method-card en">
+      <div class="flag-emoji">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+      <div class="method-country">Inglaterra</div>
+      <div class="method-label">INTENSIDADE + DUELO INDIVIDUAL</div>
+      <div class="method-title">Ritmo + Pressão Alta</div>
+      <div class="method-text">A escola inglesa valoriza intensidade máxima, disputas 1x1 (duelos) e velocidade de jogo. Treinadores premiados britânicos recomendam sessões individuais de 2 horas com 1.000+ toques na bola, sempre jogando no ritmo de jogo real — 1 ou 2 toques, com velocidade. Resistência anaeróbia e capacidade de sustentar alta intensidade por 90 minutos são o padrão.</div>
+      <div class="method-takeaway">✦ Para você aplicar: Passe na parede no ritmo máximo (1 toque). HIIT simulando o ritmo de jogo. Todo exercício técnico deve ser feito sob fadiga moderada.</div>
+    </div>
+
+    <div class="method-card nl">
+      <div class="flag-emoji">🇳🇱</div>
+      <div class="method-country">Holanda</div>
+      <div class="method-label">FUTEBOL TOTAL / POSICIONAL</div>
+      <div class="method-title">Visão + Inteligência de Jogo</div>
+      <div class="method-text">O Ajax e a escola holandesa de Cruyff pregam que futebol é jogado com a cabeça, não só com os pés. Todo jogador deve entender todas as posições. Os treinos usam rondos (posse de bola em espaços reduzidos) que desenvolvem visão, controle sob pressão e tomada de decisão. Os jogadores aprendem a nunca perder a bola em espaços pequenos.</div>
+      <div class="method-takeaway">✦ Para você aplicar: Rondo solo — conduza em espaço de 3x3m o máximo que conseguir. Treine o controle orientado: receba já apontando para o próximo passe.</div>
+    </div>
+
+    <div class="method-card pt">
+      <div class="flag-emoji">🇵🇹</div>
+      <div class="method-country">Portugal</div>
+      <div class="method-label">PERIODIZAÇÃO TÁTICA</div>
+      <div class="method-title">Tudo integrado ao jogo</div>
+      <div class="method-text">A periodização tática portuguesa (Vítor Frade/José Mourinho) coloca o modelo de jogo como orientador de tudo. Físico, técnico e mental são treinados sempre em contexto de jogo. Cada sessão tem um princípio tático específico. Na Europa, clubes portugueses são referência em psicologia esportiva — o psicólogo está em campo, analisa o jogador e passa o parecer ao treinador.</div>
+      <div class="method-takeaway">✦ Para você aplicar: Defina um princípio de jogo para cada treino (ex: "hoje foco na transição ofensiva"). Estude 20 min de jogo por dia com esse foco específico.</div>
+    </div>
+
+  </div>
+
+  <div class="big-quote">
+    <div class="bq-mark">"</div>
+    <div class="bq-text">O futebol é um jogo para ser disputado com a cabeça. Os pés servem para te mover pelo campo.</div>
+    <div class="bq-source">— JOHAN CRUYFF · Ajax / Barcelona · Escola Holandesa</div>
+  </div>
+
+  <div class="section-head">
+    <span class="section-num">02</span>
+    <h2>O que os olheiros buscam</h2>
+  </div>
+
+  <div class="scout-grid">
+    <div class="scout-item">
+      <div class="scout-rank">01</div>
+      <div class="scout-title">Técnica com os dois pés</div>
+      <div class="scout-desc">Qualquer clube europeu descarta jogadores que só usam um pé. É eliminatório em testes.</div>
+    </div>
+    <div class="scout-item">
+      <div class="scout-rank">02</div>
+      <div class="scout-title">Velocidade de decisão</div>
+      <div class="scout-desc">Academias na Espanha confirmam: a primeira coisa que avaliam é quanto tempo o jogador demora para decidir.</div>
+    </div>
+    <div class="scout-item">
+      <div class="scout-rank">03</div>
+      <div class="scout-title">Capacidade defensiva</div>
+      <div class="scout-desc">Segundo olheiros da Alicante Football Academy: "clubes sempre olham como o jogador defende", independente da posição.</div>
+    </div>
+    <div class="scout-item">
+      <div class="scout-rank">04</div>
+      <div class="scout-title">Condição física visível</div>
+      <div class="scout-desc">Resistência para os 90 min + capacidade de sprint repetido. Avaliado nos primeiros 10 min de observação.</div>
+    </div>
+    <div class="scout-item">
+      <div class="scout-rank">05</div>
+      <div class="scout-title">Atitude em campo</div>
+      <div class="scout-desc">Postura, comprometimento, reação a erros. Clubes brasileiros e europeus concordam: caráter pesa muito.</div>
+    </div>
+    <div class="scout-item">
+      <div class="scout-rank">06</div>
+      <div class="scout-title">Visão de jogo</div>
+      <div class="scout-desc">Capacidade de olhar antes de receber a bola. O exercício holandês de "conduzir sem olhar" desenvolve isso.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ TAB: ROTINA SEMANAL ============ -->
+<div class="tab-panel" id="tab-rotina">
+
+  <div class="week-intro">
+    <div class="week-intro-stat">
+      <div class="wis-label">Sessões/semana</div>
+      <div class="wis-val" style="color:var(--br)">6 DIAS</div>
+    </div>
+    <div class="week-intro-stat">
+      <div class="wis-label">Duração/sessão</div>
+      <div class="wis-val">90–120 MIN</div>
+    </div>
+    <div class="week-intro-stat">
+      <div class="wis-label">Toques/semana</div>
+      <div class="wis-val" style="color:var(--mid)">5.000+</div>
+    </div>
+    <div class="week-intro-stat">
+      <div class="wis-label">Descanso</div>
+      <div class="wis-val" style="color:var(--muted2)">DOM</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--br)"></div>EXERCÍCIO BRASILEIRO</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--es)"></div>ESPANHOL</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--de)"></div>ALEMÃO</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--en)"></div>INGLÊS</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--nl)"></div>HOLANDÊS</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--pt)"></div>PORTUGUÊS</div>
+  </div>
+
+  <!-- === DIA 1: SEGUNDA === -->
+  <div class="day" id="day1">
+    <div class="day-bar" onclick="toggleDay('day1')">
+      <div class="day-accent" style="background:var(--br)"></div>
+      <div class="day-content">
+        <div class="day-left-info">
+          <div class="day-num" style="color:var(--br)">1</div>
+          <div class="day-text">
+            <div class="day-name" style="color:var(--br)">Segunda-feira</div>
+            <div class="day-subtitle">Fundamentos Técnicos + Resistência Aeróbia · Foco: Brasil 🇧🇷 + Portugal 🇵🇹</div>
+          </div>
+        </div>
+        <div class="day-right">
+          <span class="int-badge int-mid">Moderada</span>
+          <span class="day-arrow">▾</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--muted2)"></div>
+          <div class="block-title">Aquecimento · Ativação neuromuscular</div>
+          <div class="block-duration">15 min</div>
+        </div>
+        <table class="ex-table">
+          <tr><td class="ex-name">Mobilidade articular completa (pescoço → tornozelos)</td><td><span class="ex-origin origin-all">universal</span></td><td class="ex-sets">8 min</td></tr>
+          <tr><td class="ex-name">Corrida progressiva + skipping alto + calcanhar<br><span class="ex-detail">Começa devagar, aumenta o ritmo gradualmente. Ativa a corrida e a coordenação de passada.</span></td><td><span class="ex-origin origin-de">🇩🇪</span></td><td class="ex-sets">7 min</td></tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--br)"></div>
+          <div class="block-title" style="color:var(--br)">Técnica Brasileira · Domínio e Controle</div>
+          <div class="block-duration">40 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Embaixadinhas pé dominante</div><div class="ex-detail">Meta progressiva: 50 → 100 → 200 seguidas. Toque suave, ritmo constante.</div></td>
+            <td><span class="ex-origin origin-br">🇧🇷</span></td>
+            <td class="ex-sets">10 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Embaixadinhas pé fraco</div><div class="ex-detail">O pé fraco determina seu nível real. Qualquer clube europeu descarta quem não usa os dois pés.</div></td>
+            <td><span class="ex-origin origin-br">🇧🇷</span></td>
+            <td class="ex-sets">8 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Controle orientado na parede</div><div class="ex-detail">Bate na parede → recebe com o peito do pé já apontando para o próximo "passe". Treina o 1º toque posicional.</div></td>
+            <td><span class="ex-origin origin-nl">🇳🇱</span></td>
+            <td class="ex-sets">10 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Passe na parede 1 toque (ritmo inglês)</div><div class="ex-detail">Distância 3–4m. 1 toque apenas. Alta velocidade. Errou a posição do pé? Começa a contagem do zero.</div></td>
+            <td><span class="ex-origin origin-en">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span></td>
+            <td class="ex-sets">12 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--pt)"></div>
+          <div class="block-title" style="color:var(--pt)">Resistência Aeróbia · Princípio Português</div>
+          <div class="block-duration">30 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Corrida contínua ritmo moderado (FC 65–75%)</div><div class="ex-detail">Você consegue falar frases durante a corrida. Simula os momentos de menor intensidade do jogo.</div></td>
+            <td><span class="ex-origin origin-pt">🇵🇹</span></td>
+            <td class="ex-sets">20 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Polichinelos + corrida estacionária alternados</div><div class="ex-detail">1 min polichinelos + 1 min corrida rápida. Simula as variações de ritmo de uma partida.</div></td>
+            <td><span class="ex-origin origin-all">geral</span></td>
+            <td class="ex-sets">5x 2min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--muted)"></div>
+          <div class="block-title" style="color:var(--muted)">Desaquecimento + Estudo de Jogo</div>
+          <div class="block-duration">15 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Alongamento estático completo</div><div class="ex-detail">Posterior de coxa, quadríceps, panturrilha, adutores. 40–60s cada grupo.</div></td>
+            <td><span class="ex-origin origin-all">geral</span></td>
+            <td class="ex-sets">8 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Vídeo de jogo (princípio tático do dia)</div><div class="ex-detail">Assista 7 min de jogo focado em apenas 1 coisa: movimentação sem bola do seu jogador de referência.</div></td>
+            <td><span class="ex-origin origin-pt">🇵🇹</span></td>
+            <td class="ex-sets">7 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="obs">💡 Segunda define o tom da semana. A escola portuguesa ensina que cada sessão deve ter um objetivo específico — hoje é domínio técnico. Foque nos fundamentos com qualidade máxima, não em quantidade.</div>
+    </div>
+  </div>
+
+  <!-- === DIA 2: TERÇA === -->
+  <div class="day" id="day2">
+    <div class="day-bar" onclick="toggleDay('day2')">
+      <div class="day-accent" style="background:var(--de)"></div>
+      <div class="day-content">
+        <div class="day-left-info">
+          <div class="day-num" style="color:var(--de)">2</div>
+          <div class="day-text">
+            <div class="day-name" style="color:var(--de)">Terça-feira</div>
+            <div class="day-subtitle">Força Funcional + Drible e Condução · Foco: Alemanha 🇩🇪 + Brasil 🇧🇷</div>
+          </div>
+        </div>
+        <div class="day-right">
+          <span class="int-badge int-high">Alta</span>
+          <span class="day-arrow">▾</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--de)"></div>
+          <div class="block-title" style="color:var(--de)">Força Funcional · Metodologia Alemã</div>
+          <div class="block-duration">45 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Agachamento unilateral (pistol squat assistido)</div><div class="ex-detail">Agachamento numa perna só segurando uma cadeira se precisar. Simula a força de perna que o futebol exige.</div></td>
+            <td><span class="ex-origin origin-de">🇩🇪</span></td>
+            <td class="ex-sets">4x 8 cada</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Avanço dinâmico (frente e lateral alternados)</div><div class="ex-detail">Avanço à frente + avanço lateral. Simula os movimentos de jogo reais. Foco na estabilidade do joelho.</div></td>
+            <td><span class="ex-origin origin-de">🇩🇪</span></td>
+            <td class="ex-sets">3x 12 cada</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Hip thrust no chão (elevação de quadril)</div><div class="ex-detail">Glúteo + posterior de coxa. Previne lesão de isquiotibial — a lesão mais comum no futebol.</div></td>
+            <td><span class="ex-origin origin-all">geral</span></td>
+            <td class="ex-sets">4x 15</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Prancha frontal + lateral</div><div class="ex-detail">Core central e oblíquos. Estabilidade de tronco é a base de todos os movimentos em campo.</div></td>
+            <td><span class="ex-origin origin-de">🇩🇪</span></td>
+            <td class="ex-sets">3x 45s cada</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Flexão de braço com toque no ombro</div><div class="ex-detail">Flexão normal + no topo toca o ombro oposto. Força de tronco superior para disputas.</div></td>
+            <td><span class="ex-origin origin-en">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span></td>
+            <td class="ex-sets">3x 12</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--br)"></div>
+          <div class="block-title" style="color:var(--br)">Técnica · Drible e Condução · Escola Brasileira</div>
+          <div class="block-duration">35 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Slalom em cones (interna + externa alternadas)</div><div class="ex-detail">8–10 cones a 50cm. Alterna parte interna e externa a cada passagem. Rastreia o tempo.</div></td>
+            <td><span class="ex-origin origin-br">🇧🇷</span></td>
+            <td class="ex-sets">10x cronometrado</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Fintas básicas em sequência (pedalada, stepover, roulette)</div><div class="ex-detail">Execute cada finta 15x com o pé dominante, depois 15x com o pé fraco. Devagar antes de acelerar.</div></td>
+            <td><span class="ex-origin origin-br">🇧🇷</span></td>
+            <td class="ex-sets">15x cada</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Condução sem olhar para a bola (exercício holandês)</div><div class="ex-detail">Conduza pelo espaço disponível sem olhar para a bola. Mude de direção constantemente. Isso desenvolve visão de jogo.</div></td>
+            <td><span class="ex-origin origin-nl">🇳🇱</span></td>
+            <td class="ex-sets">10 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="obs">💡 Terça é o dia de força. Descanso de 60–90s entre séries. A escola alemã é a mais rigorosa neste aspecto — base física sólida é inegociável. Sem ela, a técnica desaparece no segundo tempo.</div>
+    </div>
+  </div>
+
+  <!-- === DIA 3: QUARTA === -->
+  <div class="day" id="day3">
+    <div class="day-bar" onclick="toggleDay('day3')">
+      <div class="day-accent" style="background:var(--nl)"></div>
+      <div class="day-content">
+        <div class="day-left-info">
+          <div class="day-num" style="color:var(--nl)">3</div>
+          <div class="day-text">
+            <div class="day-name" style="color:var(--nl)">Quarta-feira</div>
+            <div class="day-subtitle">Recuperação + Visão de Jogo (Rondo) · Foco: Holanda 🇳🇱 + Portugal 🇵🇹</div>
+          </div>
+        </div>
+        <div class="day-right">
+          <span class="int-badge int-low">Leve</span>
+          <span class="day-arrow">▾</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--muted2)"></div>
+          <div class="block-title">Recuperação Ativa</div>
+          <div class="block-duration">25 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Caminhada rápida ou trote leve</div><div class="ex-detail">FC 55–60%. Ativa circulação sem estressar os músculos do dia anterior.</div></td>
+            <td><span class="ex-origin origin-all">geral</span></td>
+            <td class="ex-sets">15 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Mobilidade de quadril no chão</div><div class="ex-detail">Posição de pombo, borboleta, figura-4. Carreira longa depende de quadril saudável.</div></td>
+            <td><span class="ex-origin origin-pt">🇵🇹</span></td>
+            <td class="ex-sets">10 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--nl)"></div>
+          <div class="block-title" style="color:var(--nl)">Rondo Solo · Metodologia Ajax/Holandesa</div>
+          <div class="block-duration">35 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Rondo de parede (4x2 solo simulado)</div><div class="ex-detail">Bate na parede — controla — bate diferente. Simule a troca rápida que o Ajax usa em espaço 4x2. Meta: 1 toque só.</div></td>
+            <td><span class="ex-origin origin-nl">🇳🇱</span></td>
+            <td class="ex-sets">3x 5 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Controle em espaço de 2x2m (rondo miniatura)</div><div class="ex-detail">Delimite um quadrado de 2x2m. Conduza dentro dele sem sair. Teste os limites do controle em espaço mínimo.</div></td>
+            <td><span class="ex-origin origin-nl">🇳🇱</span></td>
+            <td class="ex-sets">5x 2 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Passes variados na parede com saída rápida</div><div class="ex-detail">Bate → move lateralmente 2 passos → recebe → bate de novo. Treina o movimento pós-passe que os holandeses exigem.</div></td>
+            <td><span class="ex-origin origin-nl">🇳🇱</span></td>
+            <td class="ex-sets">15 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--pt)"></div>
+          <div class="block-title" style="color:var(--pt)">Estudo Tático · Periodização Portuguesa</div>
+          <div class="block-duration">25 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Análise de jogo com foco único</div><div class="ex-detail">Escolha 1 princípio: "transição ofensiva", "pressão alta", "saída de bola". Assista 25 min analisando APENAS isso.</div></td>
+            <td><span class="ex-origin origin-pt">🇵🇹</span></td>
+            <td class="ex-sets">25 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="obs">💡 Quarta é dia de respirar — mas não de "descansar o cérebro". A escola holandesa e portuguesa ensina que o desenvolvimento cognitivo é contínuo. Use esse dia para evoluir o que os outros não treínam: inteligência de jogo.</div>
+    </div>
+  </div>
+
+  <!-- === DIA 4: QUINTA === -->
+  <div class="day" id="day4">
+    <div class="day-bar" onclick="toggleDay('day4')">
+      <div class="day-accent" style="background:var(--high)"></div>
+      <div class="day-content">
+        <div class="day-left-info">
+          <div class="day-num" style="color:var(--high)">4</div>
+          <div class="day-text">
+            <div class="day-name" style="color:var(--high)">Quinta-feira</div>
+            <div class="day-subtitle">Velocidade + Explosão + Finalização · Foco: Alemanha 🇩🇪 + Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+          </div>
+        </div>
+        <div class="day-right">
+          <span class="int-badge int-max">Máxima</span>
+          <span class="day-arrow">▾</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--de)"></div>
+          <div class="block-title" style="color:var(--de)">Velocidade e Explosão · Física Alemã</div>
+          <div class="block-duration">40 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Sprint de partida parada 15–20m</div><div class="ex-detail">Saída em posição baixa. 100% de esforço. Descanso 90s. Jogadores correm em tiros de 10–40s — nunca mais.</div></td>
+            <td><span class="ex-origin origin-de">🇩🇪</span></td>
+            <td class="ex-sets">8x 20m</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">T-drill com mudança de direção</div><div class="ex-detail">T de cones: 10m frente + 5m lat. esq. + 10m lat. dir. + 5m lat. esq. + 10m volta. Cronometre e melhore.</div></td>
+            <td><span class="ex-origin origin-en">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span></td>
+            <td class="ex-sets">6x máx.</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Salto vertical com agachamento (squat jump)</div><div class="ex-detail">Agacha 90° → explode em salto máximo. Potência de chute e disputas aéreas dependem deste movimento.</div></td>
+            <td><span class="ex-origin origin-de">🇩🇪</span></td>
+            <td class="ex-sets">4x 10</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Salto lateral explosivo (bounding)</div><div class="ex-detail">Saltos laterais rápidos, empurrando forte do chão. Imita exatamente o movimento de esquivar de adversários.</div></td>
+            <td><span class="ex-origin origin-all">geral</span></td>
+            <td class="ex-sets">4x 30s</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--en)"></div>
+          <div class="block-title" style="color:var(--en)">Finalização · Metodologia Inglesa (Alta Intensidade)</div>
+          <div class="block-duration">30 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Chute com alvo marcado (40x40cm na parede)</div><div class="ex-detail">Peito do pé. Alterna os dois pés a cada 5 chutes. Chute fraco no alvo vale mais que chute forte fora.</div></td>
+            <td><span class="ex-origin origin-en">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span></td>
+            <td class="ex-sets">20x cada pé</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Chute após condução de 5m</div><div class="ex-detail">Conduz em aceleração → chute forte. Simula a chegada à área após driblar o último defensor.</div></td>
+            <td><span class="ex-origin origin-br">🇧🇷</span></td>
+            <td class="ex-sets">15x cada pé</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Chute de primeira (rebote da parede)</div><div class="ex-detail">Bate na parede forte → rebote vem de volta → chute de primeira sem controle. Treina timing e decisão rápida.</div></td>
+            <td><span class="ex-origin origin-en">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span></td>
+            <td class="ex-sets">10 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="obs">💡 Quinta é o dia mais pesado da semana. Nunca treine velocidade com fadiga acumulada — se estiver mal, reduza volume, não intensidade. A escola inglesa confirma: qualidade do esforço máximo é o que importa.</div>
+    </div>
+  </div>
+
+  <!-- === DIA 5: SEXTA === -->
+  <div class="day" id="day5">
+    <div class="day-bar" onclick="toggleDay('day5')">
+      <div class="day-accent" style="background:var(--es)"></div>
+      <div class="day-content">
+        <div class="day-left-info">
+          <div class="day-num" style="color:var(--es)">5</div>
+          <div class="day-text">
+            <div class="day-name" style="color:var(--es)">Sexta-feira</div>
+            <div class="day-subtitle">HIIT + Treino Posicional Espanhol · Foco: Espanha 🇪🇸 + Holanda 🇳🇱</div>
+          </div>
+        </div>
+        <div class="day-right">
+          <span class="int-badge int-high">Alta</span>
+          <span class="day-arrow">▾</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--es)"></div>
+          <div class="block-title" style="color:var(--es)">HIIT Futebol · Ritmo de Jogo Real</div>
+          <div class="block-duration">35 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">HIIT 30/30 (30s máx / 30s ativo)</div><div class="ex-detail">30s sprint estacionário máximo (ou tiros de 15m) → 30s caminhada. Exato ritmo de acelerações e pausas de uma partida.</div></td>
+            <td><span class="ex-origin origin-en">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span></td>
+            <td class="ex-sets">12 rounds</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Escada de agilidade (ou linhas de fita no chão)</div><div class="ex-detail">Padrões: in-in-out-out, lateral, cruzado. Melhora a frequência de passada — a diferença entre ganhar ou perder 1x1.</div></td>
+            <td><span class="ex-origin origin-de">🇩🇪</span></td>
+            <td class="ex-sets">8 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Burpee + Sprint 10m</div><div class="ex-detail">10 burpees → sprint 10m → volta caminhando. Simula a recuperação defensiva após perder a bola.</div></td>
+            <td><span class="ex-origin origin-all">geral</span></td>
+            <td class="ex-sets">5x 10</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--es)"></div>
+          <div class="block-title" style="color:var(--es)">Treino Posicional · Jogo de Posição Espanhol</div>
+          <div class="block-duration">40 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Variação sem repetição (Differential Learning alemão)</div><div class="ex-detail">Cada repetição do passe é feita diferente da anterior: posição do corpo, ângulo do pé, velocidade. Ativa o cérebro.</div></td>
+            <td><span class="ex-origin origin-de">🇩🇪</span></td>
+            <td class="ex-sets">10 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Circuito posicional com bola</div><div class="ex-detail">Drible 5 cones → passe na parede 5x → sprint 15m → controle + condução de volta. Repete sem pausa.</div></td>
+            <td><span class="ex-origin origin-es">🇪🇸</span></td>
+            <td class="ex-sets">8x cronometrado</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Treino livre com bola — improviso</div><div class="ex-detail">SEM padrão. A escola espanhola e brasileira valorizam a expressão individual. Invente, tente coisas novas, erre com liberdade.</div></td>
+            <td><span class="ex-origin origin-br">🇧🇷</span></td>
+            <td class="ex-sets">20 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="obs">💡 Sexta combina o melhor: intensidade inglesa no físico + liberdade criativa brasileira + variação cognitiva alemã. A combinação dessas escolas é o que forma um jogador realmente completo.</div>
+    </div>
+  </div>
+
+  <!-- === DIA 6: SÁBADO === -->
+  <div class="day" id="day6">
+    <div class="day-bar" onclick="toggleDay('day6')">
+      <div class="day-accent" style="background:var(--max)"></div>
+      <div class="day-content">
+        <div class="day-left-info">
+          <div class="day-num" style="color:var(--max)">6</div>
+          <div class="day-text">
+            <div class="day-name" style="color:var(--max)">Sábado</div>
+            <div class="day-subtitle">Jogo Real / Simulação Completa · Todas as escolas</div>
+          </div>
+        </div>
+        <div class="day-right">
+          <span class="int-badge int-max">Jogo</span>
+          <span class="day-arrow">▾</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--max)"></div>
+          <div class="block-title">Simulação de Partida · Prioridade Absoluta</div>
+          <div class="block-duration">60–90 min</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">OPÇÃO A — Jogo real (society, futsal, pelada, pelada com amigos)</div><div class="ex-detail">Qualquer jogo real. Aplique os princípios estudados: 1º toque posicional, condução sem olhar, variação de passes, movimentação sem bola.</div></td>
+            <td><span class="ex-origin origin-all">todas</span></td>
+            <td class="ex-sets">60–90 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">OPÇÃO B — Circuito de alta intensidade com bola</div><div class="ex-detail">Drible 5 cones → sprint → passe parede 5x → controle → volta. 30 min ininterruptos simulando jogo.</div></td>
+            <td><span class="ex-origin origin-br">🇧🇷</span></td>
+            <td class="ex-sets">30 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Cobranças de falta e pênalti (se houver espaço)</div><div class="ex-detail">20 faltas + 10 pênaltis. Foco em precisão total. Antes de chutar: visualize o trajeto da bola.</div></td>
+            <td><span class="ex-origin origin-es">🇪🇸</span></td>
+            <td class="ex-sets">30 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="obs">💡 Sábado = dia de jogo. Tudo que você treinou se manifesta aqui. A escola espanhola é clara: nada substitui a simulação real de jogo. Busque SEMPRE ambientes competitivos reais — só eles testam decisão sob pressão.</div>
+    </div>
+  </div>
+
+  <!-- === DIA 7: DOMINGO === -->
+  <div class="day" id="day7">
+    <div class="day-bar" onclick="toggleDay('day7')">
+      <div class="day-accent" style="background:var(--muted)"></div>
+      <div class="day-content">
+        <div class="day-left-info">
+          <div class="day-num" style="color:var(--muted)">7</div>
+          <div class="day-text">
+            <div class="day-name" style="color:var(--muted2)">Domingo</div>
+            <div class="day-subtitle">Descanso total + Preparação mental · Protocolo europeu</div>
+          </div>
+        </div>
+        <div class="day-right">
+          <span class="int-badge int-low">Repouso</span>
+          <span class="day-arrow">▾</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-body">
+
+      <div class="block">
+        <div class="block-header">
+          <div class="block-dot" style="background:var(--muted)"></div>
+          <div class="block-title">Protocolo de Recuperação Europeu</div>
+          <div class="block-duration">30–45 min opcional</div>
+        </div>
+        <table class="ex-table">
+          <tr>
+            <td><div class="ex-name">Caminhada leve 20–30 min</div><div class="ex-detail">Não é treino. É recuperação ativa. Ativa a circulação sem desgaste muscular.</div></td>
+            <td><span class="ex-origin origin-all">geral</span></td>
+            <td class="ex-sets">opcional</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Avaliação da semana (diário do atleta)</div><div class="ex-detail">5 frases: o que melhorou, o que foi difícil, o que refazer. Na Europa, atletas têm psicólogo presente. Você faz o seu próprio autodiagnóstico.</div></td>
+            <td><span class="ex-origin origin-pt">🇵🇹</span></td>
+            <td class="ex-sets">15 min</td>
+          </tr>
+          <tr>
+            <td><div class="ex-name">Visualização da próxima semana</div><div class="ex-detail">Fecha os olhos 10 min, visualize você executando os treinos. Neurociência comprova: ativa os mesmos circuitos do movimento real.</div></td>
+            <td><span class="ex-origin origin-es">🇪🇸</span></td>
+            <td class="ex-sets">10 min</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="obs">💡 Clube europeu ou não: domingo é intocável. O corpo cresce durante o repouso, não durante o treino. CR7 dorme 8h + 5 sonecas de 1h30. A recuperação É parte do treinamento.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ TAB: FÍSICO DETALHADO ============ -->
+<div class="tab-panel" id="tab-fisico">
+
+  <div class="section-head">
+    <span class="section-num">03</span>
+    <h2>Blocos físicos por valência</h2>
+  </div>
+
+  <div class="phys-grid">
+
+    <div class="phys-card">
+      <div class="phys-icon">⚡</div>
+      <div class="phys-title">Velocidade & Sprints</div>
+      <div class="phys-exs">
+        Sprint 10m (partida parada)<br>
+        Sprint 20m (partida agachado)<br>
+        T-drill com mudança 90°<br>
+        Bounding lateral explosivo<br>
+        Sprint com bola (resistido)<br>
+        Pro-agility (5-10-5 drill)
+      </div>
+      <div class="phys-origin">🇩🇪 ALEMANHA + 🏴󠁧󠁢󠁥󠁮󠁧󠁿 INGLATERRA</div>
+    </div>
+
+    <div class="phys-card">
+      <div class="phys-icon">🦵</div>
+      <div class="phys-title">Força Funcional</div>
+      <div class="phys-exs">
+        Agachamento unilateral<br>
+        Avanço dinâmico (4 direções)<br>
+        Hip thrust no chão<br>
+        Step-up em degrau<br>
+        Elevação de panturrilha (1 perna)<br>
+        Agachamento com salto
+      </div>
+      <div class="phys-origin">🇩🇪 ALEMANHA · Sem academia</div>
+    </div>
+
+    <div class="phys-card">
+      <div class="phys-icon">🔥</div>
+      <div class="phys-title">Pliometria</div>
+      <div class="phys-exs">
+        Squat jump<br>
+        Salto lateral (bounding)<br>
+        Box jump (degrau ou caixa)<br>
+        Salto com agachamento<br>
+        Drop jump<br>
+        Salto em profundidade
+      </div>
+      <div class="phys-origin">🇩🇪 + 🏴󠁧󠁢󠁥󠁮󠁧󠁿 Explosive power</div>
+    </div>
+
+    <div class="phys-card">
+      <div class="phys-icon">🫀</div>
+      <div class="phys-title">Resistência Aeróbia</div>
+      <div class="phys-exs">
+        Corrida contínua 20–30 min<br>
+        Skipping + polichinelos alternados<br>
+        Corrida com mudança de ritmo<br>
+        Trote + sprint (fartlek)<br>
+        Corrida com variações de passada<br>
+        Subida e descida de escada
+      </div>
+      <div class="phys-origin">🇵🇹 PORTUGAL · Base aeróbia</div>
+    </div>
+
+    <div class="phys-card">
+      <div class="phys-icon">💥</div>
+      <div class="phys-title">HIIT Anaeróbio</div>
+      <div class="phys-exs">
+        30/30 (sprint/repouso ativo)<br>
+        Burpee + sprint 10m<br>
+        Tabata (20s/10s x8 rounds)<br>
+        HIIT com bola<br>
+        Escada de agilidade<br>
+        Estações em circuito
+      </div>
+      <div class="phys-origin">🏴󠁧󠁢󠁥󠁮󠁧󠁿 INGLÊS · Ritmo de jogo</div>
+    </div>
+
+    <div class="phys-card">
+      <div class="phys-icon">🧘</div>
+      <div class="phys-title">Core & Mobilidade</div>
+      <div class="phys-exs">
+        Prancha frontal e lateral<br>
+        Rotação de tronco (russian twist)<br>
+        Bird-dog<br>
+        Dead bug<br>
+        Mobilidade de quadril<br>
+        Mobilidade de tornozelo
+      </div>
+      <div class="phys-origin">🇪🇸 ESPANHA · Prevenção de lesões</div>
+    </div>
+
+  </div>
+
+  <div class="highlight-box">
+    <p>⚠️ <strong>Regra de ouro dos preparadores europeus:</strong> nunca aumente o volume de treino mais de 20% por semana. A causa mais comum de lesão entre jogadores sem clube é exatamente a progressão agressiva demais. Construa a base antes de acelerar.</p>
+  </div>
+
+</div>
+
+<!-- ============ TAB: MENTAL ============ -->
+<div class="tab-panel" id="tab-mental">
+
+  <div class="section-head">
+    <span class="section-num">04</span>
+    <h2>Preparação mental</h2>
+  </div>
+
+  <p style="color:var(--muted2); font-size:12px; margin-bottom:16px;">Enquanto no Brasil o psicólogo ainda é opcional, na Europa ele faz parte obrigatória da comissão técnica. Você vai simular esse suporte de forma individual.</p>
+
+  <div class="mental-row">
+    <div class="mental-icon">🎯</div>
+    <div>
+      <div class="mental-title">Foco no presente, não no resultado</div>
+      <div class="mental-desc">A maior diferença entre atletas europeus e brasileiros segundo psicólogos esportivos: na Europa, o jogador foca no que pode controlar agora — a qualidade do toque, a posição do pé, a decisão de passe. Não no pentest ou no contrato. Defina um objetivo técnico para cada sessão e avalie APENAS ele.</div>
+    </div>
+    <div class="mental-source">🇪🇺 EUROPA</div>
+  </div>
+
+  <div class="mental-row">
+    <div class="mental-icon">🧠</div>
+    <div>
+      <div class="mental-title">Visualização técnica (pré-treino)</div>
+      <div class="mental-desc">3–5 minutos antes de cada treino, com os olhos fechados, visualize os exercícios que você vai fazer. Veja o movimento perfeito. O cérebro ativa os mesmos circuitos neurais — isso é ciência, não misticismo. O Barcelona usa isso desde Cruyff.</div>
+    </div>
+    <div class="mental-source">🇳🇱 HOLANDA / 🇪🇸 ESPANHA</div>
+  </div>
+
+  <div class="mental-row">
+    <div class="mental-icon">📓</div>
+    <div>
+      <div class="mental-title">Diário do atleta (após cada sessão)</div>
+      <div class="mental-desc">5 linhas: data, o que treinou, nota de 1–10, o que melhorou, o que precisa refazer. Clubes europeus monitoram os atletas via apps que medem estado fisiológico e psicológico. Você faz o seu próprio monitoramento.</div>
+    </div>
+    <div class="mental-source">🇵🇹 PORTUGAL</div>
+  </div>
+
+  <div class="mental-row">
+    <div class="mental-icon">📺</div>
+    <div>
+      <div class="mental-title">Análise de jogo com princípio único</div>
+      <div class="mental-desc">A periodização tática portuguesa determina: cada sessão tem um princípio. No vídeo, assista 20 min focado em 1 coisa: como o seu jogador referência se move SEM bola, como ele posiciona o corpo para receber, onde ele vai quando o time perde a bola.</div>
+    </div>
+    <div class="mental-source">🇵🇹 PORTUGAL</div>
+  </div>
+
+  <div class="mental-row">
+    <div class="mental-icon">🔄</div>
+    <div>
+      <div class="mental-title">Encarar dificuldades como desafios</div>
+      <div class="mental-desc">Psicólogos esportivos que acompanharam times na quarentena de 2020 orientaram: trate cada obstáculo como oportunidade de fortalecer o que estava fraco. Você não tem clube? Ótimo — tem mais tempo de treino individual do que qualquer jogador que treina em grupo. Use isso.</div>
+    </div>
+    <div class="mental-source">🏴󠁧󠁢󠁥󠁮󠁧󠁿 BRIGHTON (2020)</div>
+  </div>
+
+  <div class="mental-row">
+    <div class="mental-icon">😴</div>
+    <div>
+      <div class="mental-title">Rotina de sono rigorosa</div>
+      <div class="mental-desc">A CBF monitora o sono dos jogadores via anel inteligente. CR7 dorme 8h + 5 sonecas de 1h30. Sono é onde o corpo cresce. Sem sono adequado, o treino de força não gera adaptação. Dorme e acorda sempre no mesmo horário — o corpo fica condicionado.</div>
+    </div>
+    <div class="mental-source">🇵🇹 CRISTIANO RONALDO</div>
+  </div>
+
+</div>
+
+<!-- ============ TAB: PERIODIZAÇÃO ============ -->
+<div class="tab-panel" id="tab-periodizacao">
+
+  <div class="section-head">
+    <span class="section-num">05</span>
+    <h2>Periodização — como evoluir ao longo dos meses</h2>
+  </div>
+
+  <p style="color:var(--muted2); font-size:12px; margin-bottom:16px;">Preparadores físicos profissionais não treinam da mesma forma o ano todo. Cada fase tem um objetivo específico. Para você que quer entrar num clube, siga essa progressão de 12 semanas.</p>
+
+  <table class="period-table">
+    <thead>
+      <tr>
+        <th>Fase</th>
+        <th>Período</th>
+        <th>Foco principal</th>
+        <th>Volume</th>
+        <th>Intensidade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>BASE</td>
+        <td>Semanas 1–4</td>
+        <td>Construir a base física e técnica. Muita repetição de fundamentos. Força geral (agachamento, core). Resistência aeróbia. Pé fraco todos os dias. Sem explosão ainda.</td>
+        <td>Alto</td>
+        <td>Moderada</td>
+      </tr>
+      <tr>
+        <td>DESENVOLV.</td>
+        <td>Semanas 5–8</td>
+        <td>Aumentar intensidade mantendo técnica. Pliometria começa aqui. Sprints curtos. Combinações técnicas mais complexas. HIIT começa a entrar. Estudo tático semanal estruturado.</td>
+        <td>Médio</td>
+        <td>Alta</td>
+      </tr>
+      <tr>
+        <td>ESPECÍFICA</td>
+        <td>Semanas 9–12</td>
+        <td>Simular o máximo possível o ambiente de jogo real. Todo exercício físico com bola. Alta intensidade em tudo. Buscar jogo real sábado. Reduz volume, maximiza qualidade e velocidade.</td>
+        <td>Baixo</td>
+        <td>Máxima</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box" style="margin-top:20px;">
+    <p><strong>Progressão semanal segura (regra universal dos preparadores):</strong> nunca aumente o volume de treino mais de 20% por semana. Quem vai de 3 para 6 sessões em uma semana está convocando lesão. Construa devagar — o clube não quer jogador lesionado.</p>
+  </div>
+
+  <div class="section-head" style="margin-top:28px;">
+    <span class="section-num">06</span>
+    <h2>Janela de recuperação</h2>
+  </div>
+
+  <table class="period-table">
+    <thead>
+      <tr>
+        <th>Tempo pós-treino</th>
+        <th>O que fazer</th>
+        <th>Por quê</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>0–30 min</td>
+        <td>Carboidrato simples + proteína (banana + ovo ou whey se tiver)</td>
+        <td>Janela anabólica: reposição de glicogênio + síntese proteica no pico</td>
+      </tr>
+      <tr>
+        <td>30–60 min</td>
+        <td>Alongamento estático + autofascial (rolo ou mãos)</td>
+        <td>Reduz DOMS (dor muscular tardia) e acelera recuperação</td>
+      </tr>
+      <tr>
+        <td>36–48h</td>
+        <td>Não treinar o mesmo grupo muscular em alta intensidade</td>
+        <td>Metabolismo anaeróbio precisa de 48–72h para recuperação completa</td>
+      </tr>
+      <tr>
+        <td>Diário</td>
+        <td>7–9h de sono + 2,5L de água mínimo</td>
+        <td>O crescimento muscular e neural ocorre durante o sono, não o treino</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer-bar">
+  <span>PROGRAMA GLOBAL · FUTEBOL SEM CLUBE</span>
+  <span>🇧🇷 🇪🇸 🇩🇪 🏴󠁧󠁢󠁥󠁮󠁧󠁿 🇳🇱 🇵🇹</span>
+  <span>6 METODOLOGIAS · 6 DIAS/SEMANA</span>
+</div>
+
+<script>
+// TABS
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// DAYS
+function toggleDay(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// Open day1 by default
+document.getElementById('day1').classList.add('open');
+</script>
+</body>
+</html>
